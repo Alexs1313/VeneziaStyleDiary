@@ -67,20 +67,21 @@ const Game = () => {
       <ImageBackground
         source={require('../../assets/images/gameBg.png')}
         style={{flex: 1}}>
-        <View style={styles.header}>
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => {
-                navigation.goBack(), setSelectedImg(null);
-              }}>
-              <Image source={require('../../assets/icons/back.png')} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Back</Text>
-          </View>
-          {step !== 6 && <Text style={styles.headerTitle}>{step}/5</Text>}
-        </View>
         <ScrollView>
+          <View style={styles.header}>
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => {
+                  navigation.goBack(), setSelectedImg(null);
+                }}>
+                <Image source={require('../../assets/icons/back.png')} />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Back</Text>
+            </View>
+            {step !== 6 && <Text style={styles.headerTitle}>{step}/5</Text>}
+          </View>
+
           {step !== 6 && (
             <View style={{marginHorizontal: 65, marginTop: 42}}>
               <Text style={styles.title}>Look №{step}</Text>
@@ -97,7 +98,7 @@ const Game = () => {
           {step === 1 && (
             <View>
               {showResult ? (
-                <View style={{marginHorizontal: 90, marginTop: 200}}>
+                <View style={{marginHorizontal: 90, marginTop: 180}}>
                   <View style={styles.questionContainer}>
                     <Text style={styles.questionText}>
                       {`This image was chosen by ${randomNumber}% of users`}
@@ -117,7 +118,7 @@ const Game = () => {
           {step === 2 && (
             <View>
               {showResult ? (
-                <View style={{marginHorizontal: 90, marginTop: 200}}>
+                <View style={{marginHorizontal: 90, marginTop: 180}}>
                   <View style={styles.questionContainer}>
                     <Text style={styles.questionText}>
                       {`This image was chosen by ${randomNumber}% of users`}
@@ -137,7 +138,7 @@ const Game = () => {
           {step === 3 && (
             <View>
               {showResult ? (
-                <View style={{marginHorizontal: 90, marginTop: 200}}>
+                <View style={{marginHorizontal: 90, marginTop: 180}}>
                   <View style={styles.questionContainer}>
                     <Text style={styles.questionText}>
                       {`This image was chosen by ${randomNumber}% of users`}
@@ -157,7 +158,7 @@ const Game = () => {
           {step === 4 && (
             <View>
               {showResult ? (
-                <View style={{marginHorizontal: 90, marginTop: 200}}>
+                <View style={{marginHorizontal: 90, marginTop: 180}}>
                   <View style={styles.questionContainer}>
                     <Text style={styles.questionText}>
                       {`This image was chosen by ${randomNumber}% of users`}
@@ -177,7 +178,7 @@ const Game = () => {
           {step === 5 && (
             <View>
               {showResult ? (
-                <View style={{marginHorizontal: 90, marginTop: 200}}>
+                <View style={{marginHorizontal: 90, marginTop: 180}}>
                   <View style={styles.questionContainer}>
                     <Text style={styles.questionText}>
                       {`This image was chosen by ${randomNumber}% of users`}
@@ -271,6 +272,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-evenly',
     gap: 7,
+    marginBottom: 60,
   },
   questionContainer: {
     width: '100%',
@@ -279,7 +281,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 10,
     marginTop: 28,
-    marginBottom: 37,
+    marginBottom: 55,
   },
   questionText: {
     fontSize: 16,

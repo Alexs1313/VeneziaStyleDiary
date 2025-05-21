@@ -66,17 +66,17 @@ const OutfitInfo = ({route}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.goBack()}>
-          <Image source={require('../../assets/icons/back.png')} />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Info</Text>
-      </View>
-
       <ScrollView>
+        <View style={styles.header}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.goBack()}>
+            <Image source={require('../../assets/icons/back.png')} />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Info</Text>
+        </View>
+
         <View style={{marginHorizontal: 16}}>
           <Image source={outfit.image} style={styles.image} />
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -134,7 +134,7 @@ const OutfitInfo = ({route}) => {
           </View>
           <Text style={styles.useText}>Use:</Text>
         </View>
-        <View>
+        <View style={{marginBottom: 30}}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {outfit.use.map(img => (
               <Image source={img} key={img} style={styles.scrollImage} />

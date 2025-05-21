@@ -1,5 +1,4 @@
 import {
-  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -7,18 +6,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useMemo, useRef, useState} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {useStore} from '../../store/context';
 
 const CreatedOutfitInfo = ({route}) => {
   const navigation = useNavigation();
   const outfit = route.params;
-
-  const [iconColor, setIconColor] = useState(false);
   const {
     removeOutfit,
     saveNotPurchasedOutfit,
@@ -26,7 +21,6 @@ const CreatedOutfitInfo = ({route}) => {
     saveOutfit,
   } = useStore();
 
-  console.log('outfit', outfit);
   const handleToggleOutfit = () => {
     if (outfit.selectedIdx === 0) {
       saveNotPurchasedOutfit(outfit.outfit);
@@ -45,36 +39,36 @@ const CreatedOutfitInfo = ({route}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+      <ScrollView>
+        <View style={styles.header}>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.goBack()}>
+              <Image source={require('../../assets/icons/back.png')} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Info</Text>
+          </View>
+
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => navigation.goBack()}>
-            <Image source={require('../../assets/icons/back.png')} />
+            onPress={() => {
+              if (outfit.selectedIdx === 0) {
+                removeOutfit(outfit.outfit.id),
+                  setTimeout(() => {
+                    navigation.goBack();
+                  }, 300);
+              } else {
+                removeNotPurchasedOutfit(outfit.outfit.id),
+                  setTimeout(() => {
+                    navigation.goBack();
+                  }, 300);
+              }
+            }}>
+            <Image source={require('../../assets/icons/del.png')} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Info</Text>
         </View>
 
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => {
-            if (outfit.selectedIdx === 0) {
-              removeOutfit(outfit.outfit.id),
-                setTimeout(() => {
-                  navigation.goBack();
-                }, 300);
-            } else {
-              removeNotPurchasedOutfit(outfit.outfit.id),
-                setTimeout(() => {
-                  navigation.goBack();
-                }, 300);
-            }
-          }}>
-          <Image source={require('../../assets/icons/del.png')} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView>
         <View style={{marginHorizontal: 16}}>
           <Image source={{uri: outfit.outfit.image}} style={styles.image} />
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -85,7 +79,7 @@ const CreatedOutfitInfo = ({route}) => {
             <Text style={styles.optionText}>{outfit.outfit.price}</Text>
           </View>
 
-          <View style={styles.optionWrap}>
+          <View style={[styles.optionWrap, {marginBottom: 110}]}>
             <Text style={styles.secText}>Clothing styles:</Text>
             <LinearGradient
               colors={['#FFDF5F', '#FFB84C']}
@@ -97,7 +91,6 @@ const CreatedOutfitInfo = ({route}) => {
           </View>
         </View>
       </ScrollView>
-
       <View style={{marginHorizontal: 16}}>
         {outfit.selectedIdx === 0 ? (
           <TouchableOpacity

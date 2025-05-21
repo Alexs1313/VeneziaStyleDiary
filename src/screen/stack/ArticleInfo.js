@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import {useNavigation} from '@react-navigation/native';
 
 const ArticleInfo = ({route}) => {

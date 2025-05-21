@@ -1,5 +1,4 @@
 import {
-  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -7,24 +6,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
-import {outfits} from '../../data/outfits';
 import LinearGradient from 'react-native-linear-gradient';
-import {
-  useFocusEffect,
-  useIsFocused,
-  useNavigation,
-} from '@react-navigation/native';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useCallback, useMemo, useRef, useState} from 'react';
+import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import {useStore} from '../../store/context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SegmentedControl from 'react-native-segmented-control-2';
 
 const WhishList = () => {
   const navigation = useNavigation();
-  const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['70%', '80%'], []);
   const {
     setFavorites,
     getOutfit,
@@ -32,15 +23,13 @@ const WhishList = () => {
     getNotPurchasedOutfit,
     notPurchasedOutfit,
   } = useStore();
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
-  const isFocused = useIsFocused();
+  const bottomSheetModalRef = useRef(null);
+  const [filteredData, setFilteredData] = useState(null);
+  const snapPoints = useMemo(() => ['50%', '80%'], []);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // useEffect(() => {
-  //   getFavorites();
-  //   getOutfit();
-  //   getNotPurchasedOutfit();
-  // }, [isFocused]);
+  const categories = ['Clothes', 'Shoes', 'Accessories'];
 
   useFocusEffect(
     useCallback(() => {
@@ -50,8 +39,21 @@ const WhishList = () => {
     }, []),
   );
 
-  console.log('userOutfit', userOutfit);
-  console.log('notPurchasedOutfit', notPurchasedOutfit);
+  const handleShowModal = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const filteredOutfits = userOutfit.filter(
+    outfit => outfit.category === filteredData,
+  );
+
+  const filteredNotPurchasedOutfit = notPurchasedOutfit.filter(
+    outfit => outfit.category === filteredData,
+  );
+
+  const saveFilter = async () => {
+    setFilteredData(selectedCategory);
+  };
 
   const getFavorites = async () => {
     try {
@@ -64,140 +66,248 @@ const WhishList = () => {
     }
   };
 
-  // Hide tab bar when sheet is open, show when closed
-  useFocusEffect(
-    useCallback(() => {
-      navigation.getParent()?.setOptions({
-        tabBarStyle: sheetOpen ? {display: 'none'} : undefined,
-      });
-      return () => {
-        // Always show tab bar when leaving screen
-        navigation.getParent()?.setOptions({
-          tabBarStyle: undefined,
-        });
-      };
-    }, [sheetOpen, navigation]),
-  );
-
-  const handleSheetChange = index => {
-    setSheetOpen(index >= 0);
-  };
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Whishlist</Text>
-      </View>
+      <ScrollView>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Whishlist</Text>
+        </View>
 
-      <ScrollView style={{paddingHorizontal: 16}}>
-        <SegmentedControl
-          style={{
-            marginTop: 24,
-            marginBottom: 16,
-            backgroundColor: '#272727',
-            borderRadius: 100,
-            height: 40,
-            width: '100%',
-          }}
-          activeTabColor="#151515"
-          activeTextColor="#fff"
-          gap={4}
-          textStyle={{color: '#fff'}}
-          tabs={['I want to buy', 'Bought']}
-          selectedTabStyle={{
-            borderRadius: 100,
-          }}
-          onChange={index => setSelectedIdx(index)}
-        />
+        <View style={{paddingHorizontal: 16}}>
+          <SegmentedControl
+            style={styles.segmentControl}
+            activeTabColor="#151515"
+            activeTextColor="#fff"
+            gap={4}
+            textStyle={{color: '#fff'}}
+            tabs={['I want to buy', 'Bought']}
+            selectedTabStyle={{
+              borderRadius: 100,
+            }}
+            onChange={index => setSelectedIdx(index)}
+          />
 
-        {selectedIdx === 0 && (
-          <View>
-            {userOutfit.length === 0 && (
-              <View style={{marginHorizontal: 16}}>
-                <Text style={styles.emptyListText}>
-                  Wishlist is empty, add your desired purchase now
-                </Text>
-              </View>
-            )}
-
-            <View style={styles.cardContainer}>
-              {userOutfit.map(outfit => (
-                <View style={styles.outfitCard} key={outfit.id}>
-                  <Image source={{uri: outfit.image}} style={styles.image} />
-                  <Text style={styles.cardTitle}>{outfit.title}</Text>
-                  <View style={styles.optionsWrap}>
-                    <LinearGradient
-                      colors={['#FFDF5F', '#FFB84C']}
-                      style={styles.gradientBorder}>
-                      <View style={styles.innerContainer}>
-                        <Text style={styles.optionText}>{outfit.category}</Text>
-                      </View>
-                    </LinearGradient>
-                  </View>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() =>
-                      navigation.navigate('CreatedOutfitInfo', {
-                        outfit,
-                        selectedIdx,
-                      })
-                    }>
-                    <LinearGradient
-                      colors={['#FFDF5F', '#FFB84C']}
-                      style={styles.gradientButton}>
-                      <Text style={styles.btnText}>Read more</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
+          {selectedIdx === 0 && (
+            <View>
+              {userOutfit.length === 0 && (
+                <View style={{marginHorizontal: 16}}>
+                  <Text style={styles.emptyListText}>
+                    Wishlist is empty, add your desired purchase now
+                  </Text>
                 </View>
-              ))}
-            </View>
-          </View>
-        )}
+              )}
 
-        {selectedIdx === 1 && (
-          <View>
-            {notPurchasedOutfit.length === 0 && (
-              <View style={{marginHorizontal: 16}}>
-                <Text style={styles.emptyListText}>
-                  Wishlist is empty, add your desired purchase now
-                </Text>
-              </View>
-            )}
-
-            <View style={styles.cardContainer}>
-              {notPurchasedOutfit.map(outfit => (
-                <View style={styles.outfitCard} key={outfit.id}>
-                  <Image source={{uri: outfit.image}} style={styles.image} />
-                  <Text style={styles.cardTitle}>{outfit.title}</Text>
-                  <View style={styles.optionsWrap}>
-                    <LinearGradient
-                      colors={['#FFDF5F', '#FFB84C']}
-                      style={styles.gradientBorder}>
-                      <View style={styles.innerContainer}>
-                        <Text style={styles.optionText}>{outfit.category}</Text>
+              {filteredData === null && (
+                <View style={styles.cardContainer}>
+                  {userOutfit.map(outfit => (
+                    <View style={styles.outfitCard} key={outfit.id}>
+                      <Image
+                        source={{uri: outfit.image}}
+                        style={styles.image}
+                      />
+                      <Text style={styles.cardTitle}>{outfit.title}</Text>
+                      <View style={styles.optionsWrap}>
+                        <LinearGradient
+                          colors={['#FFDF5F', '#FFB84C']}
+                          style={styles.gradientBorder}>
+                          <View style={styles.innerContainer}>
+                            <Text style={styles.optionText}>
+                              {outfit.category}
+                            </Text>
+                          </View>
+                        </LinearGradient>
                       </View>
-                    </LinearGradient>
-                  </View>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() =>
-                      navigation.navigate('CreatedOutfitInfo', {
-                        outfit,
-                        selectedIdx,
-                      })
-                    }>
-                    <LinearGradient
-                      colors={['#FFDF5F', '#FFB84C']}
-                      style={styles.gradientButton}>
-                      <Text style={styles.btnText}>Read more</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() =>
+                          navigation.navigate('CreatedOutfitInfo', {
+                            outfit,
+                            selectedIdx,
+                          })
+                        }>
+                        <LinearGradient
+                          colors={['#FFDF5F', '#FFB84C']}
+                          style={styles.gradientButton}>
+                          <Text style={styles.btnText}>Read more</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
                 </View>
-              ))}
+              )}
+
+              <View style={styles.cardContainer}>
+                {filteredOutfits.map(outfit => (
+                  <View style={styles.outfitCard} key={outfit.id}>
+                    <Image source={{uri: outfit.image}} style={styles.image} />
+                    <Text style={styles.cardTitle}>{outfit.title}</Text>
+                    <View style={styles.optionsWrap}>
+                      <LinearGradient
+                        colors={['#FFDF5F', '#FFB84C']}
+                        style={styles.gradientBorder}>
+                        <View style={styles.innerContainer}>
+                          <Text style={styles.optionText}>
+                            {outfit.category}
+                          </Text>
+                        </View>
+                      </LinearGradient>
+                    </View>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() =>
+                        navigation.navigate('CreatedOutfitInfo', {
+                          outfit,
+                          selectedIdx,
+                        })
+                      }>
+                      <LinearGradient
+                        colors={['#FFDF5F', '#FFB84C']}
+                        style={styles.gradientButton}>
+                        <Text style={styles.btnText}>Read more</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
             </View>
-          </View>
-        )}
+          )}
+
+          {selectedIdx === 1 && (
+            <View>
+              {notPurchasedOutfit.length === 0 && (
+                <View style={{marginHorizontal: 16}}>
+                  <Text style={styles.emptyListText}>
+                    Wishlist is empty, add your desired purchase now
+                  </Text>
+                </View>
+              )}
+
+              {filteredData === null && (
+                <View style={styles.cardContainer}>
+                  {notPurchasedOutfit.map(outfit => (
+                    <View style={styles.outfitCard} key={outfit.id}>
+                      <Image
+                        source={{uri: outfit.image}}
+                        style={styles.image}
+                      />
+                      <Text style={styles.cardTitle}>{outfit.title}</Text>
+                      <View style={styles.optionsWrap}>
+                        <LinearGradient
+                          colors={['#FFDF5F', '#FFB84C']}
+                          style={styles.gradientBorder}>
+                          <View style={styles.innerContainer}>
+                            <Text style={styles.optionText}>
+                              {outfit.category}
+                            </Text>
+                          </View>
+                        </LinearGradient>
+                      </View>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() =>
+                          navigation.navigate('CreatedOutfitInfo', {
+                            outfit,
+                            selectedIdx,
+                          })
+                        }>
+                        <LinearGradient
+                          colors={['#FFDF5F', '#FFB84C']}
+                          style={styles.gradientButton}>
+                          <Text style={styles.btnText}>Read more</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              <View style={styles.cardContainer}>
+                {filteredNotPurchasedOutfit.map(outfit => (
+                  <View style={styles.outfitCard} key={outfit.id}>
+                    <Image source={{uri: outfit.image}} style={styles.image} />
+                    <Text style={styles.cardTitle}>{outfit.title}</Text>
+                    <View style={styles.optionsWrap}>
+                      <LinearGradient
+                        colors={['#FFDF5F', '#FFB84C']}
+                        style={styles.gradientBorder}>
+                        <View style={styles.innerContainer}>
+                          <Text style={styles.optionText}>
+                            {outfit.category}
+                          </Text>
+                        </View>
+                      </LinearGradient>
+                    </View>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() =>
+                        navigation.navigate('CreatedOutfitInfo', {
+                          outfit,
+                          selectedIdx,
+                        })
+                      }>
+                      <LinearGradient
+                        colors={['#FFDF5F', '#FFB84C']}
+                        style={styles.gradientButton}>
+                        <Text style={styles.btnText}>Read more</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
+
+        <View>
+          <BottomSheetModal
+            ref={bottomSheetModalRef}
+            index={1}
+            snapPoints={snapPoints}
+            backgroundStyle={{backgroundColor: '#272727'}}
+            handleIndicatorStyle={{backgroundColor: '#fff'}}>
+            <BottomSheetView>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Filters</Text>
+                <Text style={styles.modalSecText}>Fashion seasons</Text>
+                <View style={styles.seasonsWrap}>
+                  {categories.map(season => (
+                    <View key={season}>
+                      {selectedCategory === season ? (
+                        <LinearGradient
+                          colors={['#FFDF5F', '#FFB84C']}
+                          style={styles.activeItem}>
+                          <Text style={styles.categoryText}>{season}</Text>
+                        </LinearGradient>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => setSelectedCategory(season)}
+                          activeOpacity={0.7}
+                          style={styles.seasonContainer}>
+                          <Text style={styles.categoryText}>{season}</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              </View>
+              <View style={{marginHorizontal: 16}}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    saveFilter();
+                  }}>
+                  <LinearGradient
+                    colors={['#FFDF5F', '#FFB84C']}
+                    style={styles.gradientFilterButton}>
+                    <Text style={styles.btnFilterText}>Apply</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </BottomSheetView>
+          </BottomSheetModal>
+        </View>
       </ScrollView>
+
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={() => navigation.navigate('CreateOutfit', selectedIdx)}>
@@ -209,35 +319,10 @@ const WhishList = () => {
       </TouchableOpacity>
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={() => bottomSheetRef.current?.expand()}
+        onPress={() => handleShowModal()}
         style={[styles.addButton, {bottom: 140, backgroundColor: '#272727'}]}>
         <Image source={require('../../assets/icons/filter.png')} />
       </TouchableOpacity>
-
-      <View
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: 900,
-          bottom: 0,
-        }}>
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-          backgroundStyle={{backgroundColor: '#272727'}}
-          onChange={handleSheetChange}
-          handleIndicatorStyle={{backgroundColor: '#fff'}}>
-          <BottomSheetView>
-            <View style={styles.modalContainer}>
-              <Text style={styles.headerTitle}>
-                This is a bottom sheet. Swipe down to close.
-              </Text>
-            </View>
-          </BottomSheetView>
-        </BottomSheet>
-      </View>
     </View>
   );
 };
@@ -279,6 +364,14 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#272727',
     borderRadius: 20,
+  },
+  segmentControl: {
+    marginTop: 24,
+    marginBottom: 16,
+    backgroundColor: '#272727',
+    borderRadius: 100,
+    height: 40,
+    width: '100%',
   },
   cardTitle: {
     fontSize: 16,
@@ -342,6 +435,52 @@ const styles = StyleSheet.create({
   modalContainer: {
     padding: 20,
     paddingVertical: 40,
+  },
+  activeItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 22,
+    borderRadius: 99,
+  },
+
+  modalContainer: {
+    padding: 20,
+    paddingVertical: 40,
+  },
+  seasonContainer: {
+    paddingVertical: 8,
+    paddingHorizontal: 22,
+    backgroundColor: '#fff',
+    borderRadius: 100,
+  },
+  seasonsWrap: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  gradientFilterButton: {
+    paddingVertical: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
+    width: '100%',
+    top: 30,
+  },
+  btnFilterText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  modalSecText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#fff',
+    marginBottom: 10,
+    marginTop: 16,
   },
 });
 

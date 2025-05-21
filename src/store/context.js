@@ -20,7 +20,6 @@ export const StoreProvider = ({children}) => {
 
       const userOutfit = [...parced, data];
       await AsyncStorage.setItem('outfit', JSON.stringify(userOutfit));
-      console.log('saved');
     } catch (e) {
       console.error('Failed', e);
     }
@@ -46,8 +45,6 @@ export const StoreProvider = ({children}) => {
 
     setUserOutfit(filtered);
     await AsyncStorage.setItem('outfit', JSON.stringify(filtered));
-
-    console.log('remove');
   };
 
   const saveNotPurchasedOutfit = async data => {
@@ -60,7 +57,6 @@ export const StoreProvider = ({children}) => {
         'notPurchasedOutfit',
         JSON.stringify(userOutfit),
       );
-      console.log('saved');
     } catch (e) {
       console.error('Failed', e);
     }
@@ -85,9 +81,8 @@ export const StoreProvider = ({children}) => {
     const filtered = data.filter(item => item.id !== selectedId);
 
     setNotPurchasedOutfit(filtered);
-    await AsyncStorage.setItem('notPurchasedOutfit', JSON.stringify(filtered));
 
-    console.log('remove');
+    await AsyncStorage.setItem('notPurchasedOutfit', JSON.stringify(filtered));
   };
 
   const value = {

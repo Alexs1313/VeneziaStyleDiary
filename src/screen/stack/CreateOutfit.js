@@ -56,19 +56,23 @@ const CreateOutfit = ({route}) => {
       }, 300);
     }
   };
+  const {title, image, price, category} = outfitData;
+
+  const isDisabled = !title || !image || !price || !category;
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.goBack()}>
-          <Image source={require('../../assets/icons/back.png')} />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>New object</Text>
-      </View>
       <ScrollView>
+        <View style={styles.header}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.goBack()}>
+            <Image source={require('../../assets/icons/back.png')} />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>New object</Text>
+        </View>
+
         <View style={{marginHorizontal: 16, marginTop: 24}}>
           {changePhoto ? (
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -127,6 +131,7 @@ const CreateOutfit = ({route}) => {
       </ScrollView>
       <View style={{marginHorizontal: 16}}>
         <TouchableOpacity
+          disabled={isDisabled}
           activeOpacity={0.7}
           onPress={() => handleSaveOutfit()}>
           <LinearGradient

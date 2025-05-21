@@ -34,44 +34,46 @@ const Favorites = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.goBack()}>
-          <Image source={require('../../assets/icons/back.png')} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Favorites</Text>
-      </View>
+      <ScrollView>
+        <View style={styles.header}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.goBack()}>
+            <Image source={require('../../assets/icons/back.png')} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Favorites</Text>
+        </View>
 
-      <ScrollView style={{paddingHorizontal: 16}}>
-        <View style={styles.cardContainer}>
-          {favorites.map(outfit => (
-            <View style={styles.outfitCard} key={outfit.id}>
-              <Image source={outfit.image} style={styles.image} />
-              <Text style={styles.cardTitle}>{outfit.title}</Text>
-              <View style={styles.optionsWrap}>
-                {outfit.options.map(option => (
+        <View style={{paddingHorizontal: 16}}>
+          <View style={styles.cardContainer}>
+            {favorites.map(outfit => (
+              <View style={styles.outfitCard} key={outfit.id}>
+                <Image source={outfit.image} style={styles.image} />
+                <Text style={styles.cardTitle}>{outfit.title}</Text>
+                <View style={styles.optionsWrap}>
+                  {outfit.options.map(option => (
+                    <LinearGradient
+                      colors={['#FFDF5F', '#FFB84C']}
+                      style={styles.gradientBorder}
+                      key={option}>
+                      <View style={styles.innerContainer}>
+                        <Text style={styles.optionText}>{option}</Text>
+                      </View>
+                    </LinearGradient>
+                  ))}
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate('OutfitInfo', outfit)}>
                   <LinearGradient
                     colors={['#FFDF5F', '#FFB84C']}
-                    style={styles.gradientBorder}
-                    key={option}>
-                    <View style={styles.innerContainer}>
-                      <Text style={styles.optionText}>{option}</Text>
-                    </View>
+                    style={styles.gradientButton}>
+                    <Text style={styles.btnText}>Read more</Text>
                   </LinearGradient>
-                ))}
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => navigation.navigate('OutfitInfo', outfit)}>
-                <LinearGradient
-                  colors={['#FFDF5F', '#FFB84C']}
-                  style={styles.gradientButton}>
-                  <Text style={styles.btnText}>Read more</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
       </ScrollView>
     </View>
