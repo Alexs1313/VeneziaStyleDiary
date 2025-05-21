@@ -14,18 +14,18 @@ const ArticleInfo = ({route}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => navigation.goBack()}>
-            <Image source={require('../../assets/icons/back.png')} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Info</Text>
-        </View>
-      </View>
-
       <ScrollView>
+        <View style={styles.header}>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.goBack()}>
+              <Image source={require('../../assets/icons/back.png')} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Info</Text>
+          </View>
+        </View>
+
         <View style={{marginHorizontal: 16, marginBottom: 40}}>
           <Image source={article.image} style={styles.image} />
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>

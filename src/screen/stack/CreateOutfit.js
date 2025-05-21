@@ -49,8 +49,13 @@ const CreateOutfit = ({route}) => {
       setTimeout(() => {
         navigation.goBack();
       }, 300);
-    } else {
+    } else if (outfitIdx === 1) {
       saveNotPurchasedOutfit(outfitData);
+      setTimeout(() => {
+        navigation.goBack();
+      }, 300);
+    } else {
+      saveOutfit(outfitData);
       setTimeout(() => {
         navigation.goBack();
       }, 300);
